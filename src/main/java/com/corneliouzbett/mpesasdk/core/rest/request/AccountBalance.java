@@ -1,4 +1,4 @@
-package com.corneliouzbett.mpesasdk.core.models;
+package com.corneliouzbett.mpesasdk.core.rest.request;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
