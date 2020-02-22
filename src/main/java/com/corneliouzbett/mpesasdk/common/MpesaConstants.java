@@ -6,4 +6,6 @@ public class MpesaConstants {
 
 	public static final String SANDBOX_DOMAIN = "https://sandbox.safaricom.co.ke";
 
+	public static final String C2B_URL = SANDBOX_DOMAIN + "/mpesa/c2b/v1/registerurl";
+
 }
