@@ -71,16 +71,22 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
                 <configuration>
                     <source>8</source>
                     <target>8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok-maven-plugin</artifactId>
+                <version>${lombok.version}.0</version>
+            </plugin>
         </plugins>
     </build>
 
     <properties>
-        <lombok.version>1.18.12</lombok.version>
+        <lombok.version>1.18.10</lombok.version>
         <retrofit.version>2.7.1</retrofit.version>
         <javax.inject.version>1</javax.inject.version>
         <json.version>20190722</json.version>
