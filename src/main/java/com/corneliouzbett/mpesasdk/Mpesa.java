@@ -1,125 +1,64 @@
+/*
+ * MIT License
+ * Copyright (c) 2020 corneliouz bett
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction,including without limitation
+ * the rights to use, copy,modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.corneliouzbett.mpesasdk;
 
-import static com.corneliouzbett.mpesasdk.util.MpesaUtils.okHttpClient;
-
-import java.io.IOException;
-
-import com.corneliouzbett.mpesasdk.core.interceptor.AuthenticationInterceptor;
-import com.corneliouzbett.mpesasdk.core.interceptor.TokenInterceptor;
-import com.corneliouzbett.mpesasdk.core.service.MpesaService;
-import com.corneliouzbett.mpesasdk.common.Log;
-import com.corneliouzbett.mpesasdk.enums.Mode;
-import com.corneliouzbett.mpesasdk.exception.AuthenticationException;
-import com.corneliouzbett.mpesasdk.util.MpesaUtils;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.json.JSONObject;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import com.corneliouzbett.mpesasdk.base.AccBalance;
+import com.corneliouzbett.mpesasdk.base.Auth;
+import com.corneliouzbett.mpesasdk.base.C2B;
+import jdk.nashorn.internal.ir.annotations.Immutable;
+import lombok.NonNull;
 
 /**
- * Singleton class to initialize/setup Mpesa environment
+ * Mpesa client, starting point to the entire library
+ *
+ * @author corneliouzbett
+ * @since 1.0.0
  */
-public class Mpesa {
 
-	private static String consumerKey;
+@Immutable
+public interface Mpesa {
 
-	private static String consumerSecret;
-
-	private static Mode mode;
-
-	private static String accessToken;
-
-	private static Log log = new Log(Mpesa.class);
 
 	/**
-	 * Initialize the Mpesa environment.
-	 *
-	 * @param consumerKey    account to use
-	 * @param consumerSecret auth token for the account
+	 * Authenticate the client
 	 */
-	static void init(String consumerKey, String consumerSecret, Mode mode) {
-		Mpesa.setConsumerKey(consumerKey);
-		Mpesa.setConsumerSecret(consumerSecret);
-		Mpesa.setMode(mode);
-		authenticate();
-	}
+	Auth authenticate();
 
-	private static void setConsumerKey(String consumerKey) {
-		if (consumerKey == null) {
-			throw new AuthenticationException("Consumer key cannot be null");
-		}
-		Mpesa.consumerKey = consumerKey;
-	}
+	/**
+	 * Get account balance
+	 *
+	 * @return Account Balance API entry point
+	 */
+	AccBalance accBalance(@NonNull String accessToken);
 
-	private static void setConsumerSecret(String consumerSecret) {
-		if (consumerSecret == null) {
-			throw new AuthenticationException("Consumer secret cannot be null");
-		}
-		Mpesa.consumerSecret = consumerSecret;
-	}
-
-	private static void setMode(Mode mode) {
-		Mpesa.mode = mode;
-	}
-
-	private static void setAccessToken(String accessToken) {
-		Mpesa.accessToken = accessToken;
-	}
-
-	private static String getAccessToken() {
-		return accessToken;
-	}
-
-	private static void authenticate() {
-		Request request = new Request.Builder()
-				.url(getAuthUrl())
-				.get().build();
-
-		OkHttpClient okHttpClient = new OkHttpClient.Builder()
-				.addInterceptor(new TokenInterceptor(consumerKey, consumerSecret)).build();
-		okHttpClient.newCall(request).enqueue(new Callback() {
-
-			@Override
-			public void onFailure(Call call, IOException e) {
-				log.info("Authentication failed");
-				throw new AuthenticationException("Unable to authenticate", e);
-			}
-
-			@Override
-			public void onResponse(Call call, Response response) throws IOException {
-				if (!response.isSuccessful()) {
-					throw new AuthenticationException("Unexpected code" + response);
-				} else {
-					if (response.body() != null) {
-						JSONObject token = new JSONObject(response.body().string());
-						log.info(token.toString());
-						Mpesa.setAccessToken(token.getString("access_token"));
-					}
-				}
-			}
-		});
-	}
-
-	private static Retrofit mpesaRestClient() {
-
-		return new Retrofit.Builder()
-				.baseUrl(MpesaUtils.getBaseUrl(mode))
-				.addConverterFactory(GsonConverterFactory.create())
-				.client(okHttpClient().addInterceptor(
-						new AuthenticationInterceptor(Mpesa.getAccessToken())).build())
-				.build();
-	}
-
-	private static MpesaService mpesaService() {
-		return mpesaRestClient().create(MpesaService.class);
-	}
-
-	private static String getAuthUrl() {
-		return MpesaUtils.getBaseUrl(mode) + "/oauth/v1/generate?grant_type=client_credentials";
-	}
+	/**
+	 * Get customer to business entry points which includes:
+	 * <ul>
+	 *     <li>Register URL</li>
+	 *     <li>Simulate Transaction</li>
+	 * </ul>
+	 *
+	 * @return c2b API entry point
+	 */
+	C2B c2b(@NonNull String accessToken);
 
 }

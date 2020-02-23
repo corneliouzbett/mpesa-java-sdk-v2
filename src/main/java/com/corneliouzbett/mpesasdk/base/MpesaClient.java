@@ -21,10 +21,6 @@
  */
 package com.corneliouzbett.mpesasdk.base;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import com.corneliouzbett.mpesasdk.Mpesa;
@@ -33,13 +29,9 @@ import com.corneliouzbett.mpesasdk.common.MpesaConstants;
 import com.corneliouzbett.mpesasdk.core.interceptor.AuthenticationInterceptor;
 import com.corneliouzbett.mpesasdk.core.interceptor.TokenInterceptor;
 import com.corneliouzbett.mpesasdk.core.rest.params.AccessToken;
-import com.corneliouzbett.mpesasdk.exception.AuthenticationException;
-import com.corneliouzbett.mpesasdk.exception.MpesaException;
 import jdk.nashorn.internal.ir.annotations.Immutable;
+import lombok.NonNull;
 import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -53,32 +45,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Immutable
 public class MpesaClient implements Mpesa {
 
-	private AccessToken accessToken;
-
-	private String consumerKey;
-
-	private String consumerSecret;
-
 	private Boolean isLive = false;
 
-	private ExecutorService executor = Executors.newSingleThreadExecutor();
-
 	private Log log = new Log(MpesaClient.class);
-
-	//Connection timeout duration
-	private final int CONNECT_TIMEOUT = 60 * 1000;
-
-	//Connection Read timeout duration
-	private final int READ_TIMEOUT = 60 * 1000;
-
-	//Connection write timeout duration
-	private final int WRITE_TIMEOUT = 60 * 1000;
 
 	private Retrofit restClient;
 
 	/**
-	 * Public constructor, for authentication with access token Use this constructor when you want to access Mpesa Daraja API
+	 * Public constructor, for authentication with access token
+	 *
+	 * Use this constructor when you want to access Mpesa Daraja API
 	 * using access token
+	 *
 	 * <pre>
 	 *     final Mpesa myMpesa = new MpesaClient(
 	 *     "<--your access token here --->"
@@ -88,41 +66,15 @@ public class MpesaClient implements Mpesa {
 	 * @param authToken authentication token
 	 */
 	public MpesaClient(AccessToken authToken) {
-		if (authToken != null) {
-			this.restClient = new Retrofit.Builder()
-					.baseUrl(MpesaConstants.SANDBOX_DOMAIN)
-					.addConverterFactory(GsonConverterFactory.create())
-					.client(this.configureClient().newBuilder().addInterceptor(
-							new AuthenticationInterceptor(authToken.getAccessToken())).build())
-					.build();
-		}
+		this.restClient = this.getRestClient(authToken.getAccessToken());
 	}
 
 	/**
-	 * Public constructor, for authentication with access token Use this constructor when you want to access Mpesa Daraja API
-	 * using access token
-	 * <pre>
-	 *     final Mpesa myMpesa = new MpesaClient(
-	 *     "<--your access token here --->"
-	 *     );
-	 * </pre>
+	 * Public constructor, for HTTP Basic authentication
 	 *
-	 * @param authToken authentication token
-	 * @param isLive    checks if app is live
-	 */
-	public MpesaClient(AccessToken authToken, Boolean isLive) {
-		this.accessToken = authToken;
-		this.restClient = new Retrofit.Builder()
-				.baseUrl(getBaseUrl(isLive))
-				.addConverterFactory(GsonConverterFactory.create())
-				.client(this.configureClient().newBuilder().addInterceptor(
-						new AuthenticationInterceptor(this.accessToken.getAccessToken())).build())
-				.build();
-	}
-
-	/**
-	 * Public constructor, for HTTP Basic authentication Use this constructor you want to access Mpesa Daraja API using
+	 * Use this constructor you want to access Mpesa Daraja API using
 	 * consumerKey and consumerSecret For instance,
+	 *
 	 * <pre>
 	 *     final Mpesa myMpesa = new MpesaClient(
 	 *     "89jMLEpzHAuW5bF28zBz7qoF332th2DB", "XKHJii8egyVXg7De"
@@ -133,95 +85,68 @@ public class MpesaClient implements Mpesa {
 	 * @param consumerSecret consumerSecret
 	 */
 	public MpesaClient(String consumerKey, String consumerSecret) {
+		new MpesaClient(consumerKey, consumerSecret, false);
+	}
+
+	/**
+	 *
+	 * @param consumerKey client consumer key
+	 * @param consumerSecret client consumer secret
+	 * @param isLive true means the app has been released to production
+	 */
+	public MpesaClient(String consumerKey, String consumerSecret, Boolean isLive) {
+		this.isLive = isLive;
 		this.restClient = new Retrofit.Builder()
-				.baseUrl(MpesaConstants.SANDBOX_DOMAIN)
+				.baseUrl(getBaseUrl(isLive))
 				.addConverterFactory(GsonConverterFactory.create())
 				.client(this.configureClient().newBuilder().addInterceptor(
 						new TokenInterceptor(consumerKey, consumerSecret)).build())
 				.build();
 	}
 
-	public MpesaClient(String consumerKey, String consumerSecret, Boolean isLive) {
-		this.consumerKey = consumerKey;
-		this.consumerSecret = consumerSecret;
-		this.isLive = isLive;
-	}
-
 	private String getBaseUrl(Boolean isLive) {
 		return isLive ? MpesaConstants.PRODUCTION_DOMAIN : MpesaConstants.SANDBOX_DOMAIN;
 	}
 
+	/**
+	 * Configures Http Client
+	 * @return OkHttpClient
+	 */
 	private OkHttpClient configureClient() {
 		return new OkHttpClient.Builder()
-				.connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
-				.readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
-				.writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
+				.connectTimeout(MpesaConstants.CONNECT_TIMEOUT, TimeUnit.SECONDS)
+				.readTimeout(MpesaConstants.READ_TIMEOUT, TimeUnit.SECONDS)
+				.writeTimeout(MpesaConstants.WRITE_TIMEOUT, TimeUnit.SECONDS)
 				.build();
 	}
 
-	private Future<AccessToken> generateToken() {
-		return this.executor.submit(this::accessToken);
-	}
-
-	private AccessToken accessToken() {
-		new Retrofit.Builder()
-				.baseUrl(this.getBaseUrl(isLive))
+	/**
+	 * Gets RestClient (pre-configured retrofit Instance)
+	 *
+	 * @param accessToken authorization token
+	 * @return Retrofit rest client pre-configured
+	 */
+	private Retrofit getRestClient(@NonNull String accessToken) {
+		return new Retrofit.Builder()
+				.baseUrl(getBaseUrl(isLive))
 				.addConverterFactory(GsonConverterFactory.create())
 				.client(this.configureClient().newBuilder().addInterceptor(
-						new TokenInterceptor(this.consumerKey, this.consumerSecret)).build())
-				.build().create(Auth.class).getAccessToken().enqueue(new Callback<AccessToken>() {
-
-			@Override
-			public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
-				if (response.isSuccessful()) {
-					log.info("Authentication successful");
-					accessToken = response.body();
-				}
-			}
-
-			@Override
-			public void onFailure(Call<AccessToken> call, Throwable throwable) {
-				log.info("Authentication failed" + throwable.getMessage());
-				throw new MpesaException("Unable to authenticate", throwable);
-			}
-		});
-		return this.accessToken;
+						new AuthenticationInterceptor(accessToken)).build())
+				.build();
 	}
 
 	@Override
-	public AccessToken generateAccessToken() {
-		return this.accessToken();
+	public Auth authenticate() {
+		return this.restClient.create(Auth.class);
 	}
 
 	@Override
-	public Mpesa authenticate() throws ExecutionException, InterruptedException {
-		return new MpesaClient(this.generateToken().get());
+	public AccBalance accBalance(@NonNull String accessToken) {
+		return this.getRestClient(accessToken).create(AccBalance.class);
 	}
 
 	@Override
-	public AccBalance accBalance() {
-		return null;
-	}
-
-	@Override
-	public C2B c2b() {
-		if (this.restClient != null) {
-			return this.getRestClient().create(C2B.class);
-		} else {
-			throw new AuthenticationException("Try authenticating again");
-		}
-	}
-
-	@Override
-	public Retrofit getRestClient(){
-		if (generateToken().isDone()) {
-			this.restClient = new Retrofit.Builder()
-					.baseUrl(getBaseUrl(isLive))
-					.addConverterFactory(GsonConverterFactory.create())
-					.client(this.configureClient().newBuilder().addInterceptor(
-							new AuthenticationInterceptor(this.accessToken.getAccessToken())).build())
-					.build();
-		}
-		return this.restClient;
+	public C2B c2b(@NonNull String accessToken) {
+		return this.getRestClient(accessToken).create(C2B.class);
 	}
 }
