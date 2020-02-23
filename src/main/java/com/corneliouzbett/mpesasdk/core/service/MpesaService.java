@@ -1,6 +1,6 @@
 package com.corneliouzbett.mpesasdk.core.service;
 
-import com.corneliouzbett.mpesasdk.core.models.AccountBalance;
+import com.corneliouzbett.mpesasdk.core.rest.request.AccountBalance;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
