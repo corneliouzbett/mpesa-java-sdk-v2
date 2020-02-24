@@ -19,3 +19,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+pom.xml.releaseBackup
+release.properties
