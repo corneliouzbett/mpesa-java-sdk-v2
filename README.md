@@ -5,12 +5,12 @@
 ## Install
 Use the following dependency in your project to grab via Maven:
 ```
-  <dependency>
-    <groupId>com.github.corneliouzbett</groupId>
-    <artifactId>mpesa-sdk</artifactId>
-    <version>1.1-SNAPSHOT</version>
-    <type>pom</type>
-  </dependency>
+ <dependency>
+  <groupId>com.github.corneliouzbett</groupId>
+  <artifactId>mpesa-sdk</artifactId>
+  <version>1.0</version>
+  <type>pom</type>
+</dependency>
 ```
  
 ## Usage
