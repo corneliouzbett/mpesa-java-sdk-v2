@@ -17,12 +17,24 @@ import retrofit2.http.POST;
  * @author corneliouz bett
  * @since 1.0.0
  */
-
 @Immutable
 public interface C2B {
 
+	/**
+	 * Register business callback and validations URL
+	 *
+	 * @param uri business URL request body
+	 * @return {@link retrofit2.Call} mpesa response
+	 */
 	@POST("/mpesa/c2b/v1/registerurl")
 	Call<MpesaResponse> registerUrl(@Body BusinessUri uri);
 
+	/**
+	 * This API entry point is used to make payment requests from Client to Business (C2B)
+	 *
+	 * @param c2b customer to business request
+	 * @return {@link retrofit2.Call} mpesa response
+	 */
+	@POST("/mpesa/c2b/v1/simulate")
 	Call<MpesaResponse> simulateTransaction(C2BRequest c2b);
 }
