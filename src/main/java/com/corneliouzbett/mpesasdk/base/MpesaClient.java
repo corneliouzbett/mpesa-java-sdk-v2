@@ -149,4 +149,14 @@ public class MpesaClient implements Mpesa {
 	public C2B c2b(@NonNull String accessToken) {
 		return this.getRestClient(accessToken).create(C2B.class);
 	}
+
+	@Override
+	public B2C b2c(@NonNull String accessToken) {
+		return this.getRestClient(accessToken).create(B2C.class);
+	}
+
+	@Override
+	public MExpress stkPush(@NonNull String accessToken) {
+		return this.getRestClient(accessToken).create(MExpress.class);
+	}
 }

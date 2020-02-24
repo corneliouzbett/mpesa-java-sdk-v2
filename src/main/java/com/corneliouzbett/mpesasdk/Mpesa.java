@@ -23,7 +23,9 @@ package com.corneliouzbett.mpesasdk;
 
 import com.corneliouzbett.mpesasdk.base.AccBalance;
 import com.corneliouzbett.mpesasdk.base.Auth;
+import com.corneliouzbett.mpesasdk.base.B2C;
 import com.corneliouzbett.mpesasdk.base.C2B;
+import com.corneliouzbett.mpesasdk.base.MExpress;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 import lombok.NonNull;
 
@@ -60,5 +62,21 @@ public interface Mpesa {
 	 * @return c2b API entry point
 	 */
 	C2B c2b(@NonNull String accessToken);
+
+	/**
+	 * Gets B2C entry points
+	 *
+	 * @param accessToken authorization Token
+	 * @return b2c API entry point
+	 */
+	B2C b2c(@NonNull  String accessToken);
+
+	/**
+	 * For Lipa Na M-Pesa payment using STK Push
+	 *
+	 * @param accessToken authorization token
+	 * @return MExpress entry point
+	 */
+	MExpress stkPush(@NonNull  String accessToken);
 
 }
