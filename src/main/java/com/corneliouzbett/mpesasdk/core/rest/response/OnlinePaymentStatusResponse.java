@@ -19,40 +19,43 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.corneliouzbett.mpesasdk.base;
+package com.corneliouzbett.mpesasdk.core.rest.response;
 
-import com.corneliouzbett.mpesasdk.core.rest.request.OnlinePayment;
-import com.corneliouzbett.mpesasdk.core.rest.request.OnlinePaymentStatus;
-import com.corneliouzbett.mpesasdk.core.rest.response.OnlinePaymentResponse;
-import com.corneliouzbett.mpesasdk.core.rest.response.OnlinePaymentStatusResponse;
-import jdk.nashorn.internal.ir.annotations.Immutable;
-import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.POST;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-/**
- * .For Lipa na Mpesa using stk push
- *
- * @author corneliouzbett
- * @since 1.0.0
- */
-@Immutable
-public interface MExpress {
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class OnlinePaymentStatusResponse {
 
-	/**
-	 * Use this API to check the status of a Lipa Na M-Pesa Online Payment
-	 *
-	 * @param onlinePaymentStatus Online payment status
-	 * @return Mpesa response
-	 */
-	@POST("/mpesa/stkpushquery/v1/query")
-	Call<OnlinePaymentStatusResponse> checkOnlinePaymentStatus(@Body OnlinePaymentStatus onlinePaymentStatus);
+	@Expose
+	@SerializedName("MerchantRequestID")
+	private String merchantRequestId;
 
-	/**
-	 * @return Mpesa response
-	 */
+	@Expose
+	@SerializedName("CheckoutRequestID")
+	private String checkoutRequestID;
 
-	@POST("/mpesa/stkpush/v1/processrequest")
-	Call<OnlinePaymentResponse> initiateOnlinePayment(@Body OnlinePayment onlinePayment);
+	@Expose
+	@SerializedName("ResponseCode")
+	private int responseCode;
+
+	@Expose
+	@SerializedName("ResultDesc")
+	private String resultDesc;
+
+	@Expose
+	@SerializedName("ResponseDescription")
+	private String responseDescription;
+
+	@Expose
+	@SerializedName("ResultCode")
+	private int resultCode;
 
 }
