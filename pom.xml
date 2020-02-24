@@ -5,10 +5,11 @@
     <groupId>com.github.corneliouzbett</groupId>
     <artifactId>mpesa-sdk</artifactId>
     <packaging>pom</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
 
     <name>mpesa-sdk</name>
     <url>https://github.com/corneliouzbett/mpesa-java-sdk-v2</url>
+    <description>A Java library for communicating with Mpesa Daraja API</description>
 
     <developers>
         <developer>
@@ -24,6 +25,12 @@
         <url>https://github.com/corneliouzbett/mpesa-java-sdk-v2.git</url>
         <tag>HEAD</tag>
     </scm>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://github.com/corneliouzbett/mpesa-java-sdk-v2/blob/master/LICENSE</url>
+        </license>
+    </licenses>
 
     <distributionManagement>
         <snapshotRepository>
