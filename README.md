@@ -6,6 +6,7 @@ A Java library for communicating with Mpesa Daraja rest API.
  > The SDK provides convenient access to the Mpesa Daraja API from applications written in Java.
 
 ## Install
+### Maven
 Use the following dependency in your project to grab via Maven:
 ```
  <dependency>
@@ -15,16 +16,36 @@ Use the following dependency in your project to grab via Maven:
   <type>pom</type>
 </dependency>
 ```
+
+### Gradle
+For android developers you can install the library by adding dependency to build.gradle
+```
+implementation 'com.github.corneliouzbett:mpesa-sdk:1.0'
+```
+
+### Gradle for Kotlin
+For kotlin developers
+```
+implementation("com.github.corneliouzbett:mpesa-sdk:1.0")
+```
+
+### Scala SBT
+For developers using scala
+```
+libraryDependencies += "com.github.corneliouzbett" % "mpesa-sdk" % "1.0"
+```
+
+###
  
 ## Usage
 The SDK needs to be initialized with your consumer key and consumer secret, which you get from the [safaricom developers portal](https://developer.safaricom.co.ke). You are required to create an app.
 
 >You can use this SDK for either production or sandbox apps.
 
-## Initialize the client
+### Initialize the client
 ```java
   String consumerKey = "AXXXX-XXXX"; //consumer key
-  String consumerSecret = "WEDX-XXXX-XXX-XXX"; consumer secret
+  String consumerSecret = "WEDX-XXXX-XXX-XXX"; //consumer secret
 
   Mpesa mpesa = new MpesaClient(consumerKey, consumerSecret); // initializing mpesa client
 ```
