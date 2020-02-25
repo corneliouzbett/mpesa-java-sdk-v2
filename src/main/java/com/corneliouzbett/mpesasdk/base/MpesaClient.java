@@ -59,7 +59,7 @@ public class MpesaClient implements Mpesa {
 	 *
 	 * <pre>
 	 *     final Mpesa myMpesa = new MpesaClient(
-	 *     "<--your access token here --->"
+	 *     "{--your access token here ---}"
 	 *     );
 	 * </pre>
 	 *
