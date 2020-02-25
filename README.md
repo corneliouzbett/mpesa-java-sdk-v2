@@ -12,7 +12,7 @@ Use the following dependency in your project to grab via Maven:
  <dependency>
   <groupId>com.github.corneliouzbett</groupId>
   <artifactId>mpesa-sdk</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
   <type>pom</type>
 </dependency>
 ```
@@ -20,19 +20,19 @@ Use the following dependency in your project to grab via Maven:
 ### Gradle
 For android developers you can install the library by adding dependency to build.gradle
 ```
-implementation 'com.github.corneliouzbett:mpesa-sdk:1.0'
+implementation 'com.github.corneliouzbett:mpesa-sdk:1.1'
 ```
 
 ### Gradle for Kotlin
 For kotlin developers
 ```
-implementation("com.github.corneliouzbett:mpesa-sdk:1.0")
+implementation("com.github.corneliouzbett:mpesa-sdk:1.1")
 ```
 
 ### Scala SBT
 For developers using scala
 ```
-libraryDependencies += "com.github.corneliouzbett" % "mpesa-sdk" % "1.0"
+libraryDependencies += "com.github.corneliouzbett" % "mpesa-sdk" % "1.1"
 ```
 
 ###
@@ -49,6 +49,99 @@ The SDK needs to be initialized with your consumer key and consumer secret, whic
 
   Mpesa mpesa = new MpesaClient(consumerKey, consumerSecret); // initializing mpesa client
 ```
+
+### Authentication
+Authenticate mpesa client and genarate accessToken used to access authorized resources (services) e.g C2B, B2C, MExpress, AccountBalance etc
+```java
+mpesa.authenticate().getAccessToken().enqueue(new Callback<>() {
+
+			@Override
+			public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
+				if (response.isSuccessful()) {
+					String accessToken = response.body().getAccessToken();
+				}
+			}
+
+			@Override
+			public void onFailure(Call<AccessToken> call, Throwable throwable) {
+				throw new MpesaException("Unable to authenticate Mpesa client", throwable);
+			}
+		});
+```
+
+### Account Balance
+This API entrypoint requests for the account balance of a shortcode (Till number).
+```java
+  AccountBalance balance = new AccountBalance();
+		balance.setCommandId("");
+		balance.setInitiator("");
+		balance.setIdentifierType("");
+		balance.setPartyA("");
+		balance.setQueueTimeOutURL("");
+		balance.setResultUrl("");
+		balance.setRemarks("");
+		balance.setSecurityCredentials("");
+  
+```
+
+### MExpress
+For Lipa Na M-Pesa payment using STK Push
+ * Check status of lipa na mpesa payment
+ 
+ ```java
+ OnlinePaymentStatus paymentStatus =
+				new OnlinePaymentStatus(0000, "",
+						Timestamp.valueOf(LocalDateTime.now()), "");
+  
+		mpesa.stkPush("accessToken").checkOnlinePaymentStatus(paymentStatus).enqueue(new Callback<>() {
+
+			@Override
+			public void onResponse(Call<OnlinePaymentStatusResponse> call, Response<OnlinePaymentStatusResponse> response) {
+
+			}
+
+			@Override
+			public void onFailure(Call<OnlinePaymentStatusResponse> call, Throwable throwable) {
+
+			}
+		});
+ ```
+ 
+ * Initiate stk push
+ ```java
+  OnlinePayment onlinePayment = new OnlinePayment();
+		onlinePayment.setAccountReference("AccRef");
+		onlinePayment.setBusinessShortCode(123);
+		onlinePayment.setCallbackURL("callbackUrl");
+		onlinePayment.setAmount("amount");
+		onlinePayment.setPartyA("partyA");
+		onlinePayment.setPartyB("partyB");
+		onlinePayment.setPhoneNumber("phoneNumber");
+		onlinePayment.setPassword("passkey");
+		onlinePayment.setTimestamp("timestamp");
+		onlinePayment.setTransactionType("transaction type");
+		onlinePayment.setTransactionDescription("transaction desc");
+		
+		mpesa.stkPush("accessToken").initiateOnlinePayment(onlinePayment).enqueue(new Callback<OnlinePaymentResponse>() {
+
+			@Override
+			public void onResponse(Call<OnlinePaymentResponse> call, Response<OnlinePaymentResponse> response) {
+
+			}
+
+			@Override
+			public void onFailure(Call<OnlinePaymentResponse> call, Throwable throwable) {
+
+			}
+		});
+ ```
+ 
+### C2B
+This API entrypoint enables Paybill and Buy Goods merchants to integrate to M-Pesa and receive real time payments notifications
+
+### B2C
+This API entrypoint enables Business to Customer (B2C) transactions between a company and customers who are the end-users of its products or services
+
 ## Note
 This Mpesa SDK is currently under active development, so expect rapid changes
 
