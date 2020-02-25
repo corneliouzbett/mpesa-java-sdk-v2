@@ -1,5 +1,8 @@
 ## Mpesa Java SDK
- A Java library for communicating with Mpesa Daraja rest API. 
+[![Build Status](https://travis-ci.com/corneliouzbett/mpesa-java-sdk-v2.svg?branch=master)](https://travis-ci.com/corneliouzbett/mpesa-java-sdk-v2)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.corneliouzbett/mpesa-sdk.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.corneliouzbett%22%20AND%20a:%22mpesa-sdk%22)
+
+A Java library for communicating with Mpesa Daraja rest API. 
  > The SDK provides convenient access to the Mpesa Daraja API from applications written in Java.
 
 ## Install
